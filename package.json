@@ -1,0 +1,29 @@
+{
+  "name": "mqttdatakeeper",
+  "version": "1.0.0",
+  "description": "Small daemon, which save all data coming to MQTT broker in MongoDB.",
+  "main": "app.js",
+  "dependencies": {
+    "async-mqtt": "^2.4.2",
+    "mongodb": "^3.3.2",
+    "nedb-async-await": "^0.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/infinic/mqttDataKeeper.git"
+  },
+  "keywords": [
+    "mqtt",
+    "mongodb"
+  ],
+  "author": "infinic",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/infinic/mqttDataKeeper/issues"
+  },
+  "homepage": "https://github.com/infinic/mqttDataKeeper#readme"
+}

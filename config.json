@@ -1,0 +1,29 @@
+{
+  "MongoDB": {
+    "url": "mongodb://localhost:27017/mqtt",
+    "defaultCollection": "messages",
+    "separator": "_",
+    "retriesTimeout": 10,
+    "options": {
+      "useNewUrlParser": true,
+      "useUnifiedTopology": false,
+      "autoReconnect": false,
+      "bufferMaxEntries": 0
+    }
+  },
+  "NeDB": {
+  	"path": "./nedb"
+  },
+  "MQTT": {
+  	"url": "tcp://localhost:1883",
+    "topic": "#",
+    "saveOnlyRoutedMessages": true,
+    "router": [
+      {"topic": "myHome/temp/indoor", "collection": "temperature", "type": "float", "name": "indoor"},
+      {"topic": "myHome/temp/outdoor", "collection": "temperature", "type": "float", "name": "outdoor"},
+      {"topic": "myHome/humidity/livingroom", "collection": "humidity", "type": "integer", "name": "livingroom"},
+      {"topic": "myHome/humidity/bedroom", "collection": "humidity", "type": "integer", "name": "bedroom"},
+      {"topic": "myHome/humidity/outdoor", "collection": "humidity", "type": "integer", "name": "outdoor"}
+    ]
+  }
+}
