@@ -109,6 +109,7 @@ const insertOneToNeDB = async(doc, col) => {
 
 const nedb2mongo = async() => {
 
+  if (!fs.existsSync(config.NeDB.path)) fs.mkdirSync(config.NeDB.path);
   let files = fs.readdirSync(config.NeDB.path);
 
   for (let filename of files) {
