@@ -8,10 +8,11 @@ const config = require('./config.json');
 var ndb = {};
 var lastValue = {};
 var lastDBValue = {};
-var lastDocument = {};
+var lastDoc = {};
+var lastDBDoc = {};
 
 var   MDBclient = new MongoClient(config.MongoDB.url, config.MongoDB.options);
-const MQTTclient = MQTT.connect(config.MQTT.url);
+const MQTTclient = MQTT.connect(config.MQTT.url, config.MQTT.options);
 
 MQTTclient.on("connect", async () => {
 
@@ -41,32 +42,41 @@ MQTTclient.on('message', async (topic, message) => {
 
   // Make document
   let doc = { [dataName]: dataValue, timestamp: new Date() };
-  
+
   // Check data accuracy
   if (obj !== undefined && obj.accuracy !== undefined) {
-  	if (lastDBValue[collection] === undefined || lastDBValue[collection][dataName] === undefined) {
-  	  // Ok...
-  	  if (lastDBValue[collection] === undefined) lastDBValue[collection] = {};
-  	  if (lastValue[collection] === undefined) lastValue[collection] = {};
-  	  if (lastDocument[collection] === undefined) lastDocument[collection] = {};
-  	  lastValue[collection][dataName] = dataValue;
+    if (lastDBValue[collection] === undefined || lastDBValue[collection][dataName] === undefined) {
+      // First message...
+      if (lastDBValue[collection] === undefined) lastDBValue[collection] = {};
+      if (lastValue[collection] === undefined) lastValue[collection] = {};
+      if (lastDoc[collection] === undefined) lastDoc[collection] = {};
+      lastValue[collection][dataName] = dataValue;
       lastDBValue[collection][dataName] = dataValue;
-      lastDocument[collection][dataName] = doc;
+      lastDoc[collection][dataName] = doc;
     } else if ( Math.abs(dataValue - lastDBValue[collection][dataName]) <= obj.accuracy ) {
-  	  // Wait next message
-  	  lastValue[collection][dataName] = dataValue;
-      lastDocument[collection][dataName] = doc;
-  	  return
-  	} else {
-  	  insertDocument(lastDocument[collection][dataName], collection);
-  	  lastValue[collection][dataName] = dataValue;
+      // In accuracy range
+      if (obj.interval === undefined || (doc['timestamp'] - lastDBDoc[collection][dataName]['timestamp'])/1000 < obj.interval ) {
+        // Time in range. Wait next message...
+        lastValue[collection][dataName] = dataValue;
+        lastDoc[collection][dataName] = doc;
+        return
+      }
+      // Time is out of interval. Insert document.
+    } else {
+      insertDocument(lastDoc[collection][dataName], collection);
+      lastValue[collection][dataName] = dataValue;
       lastDBValue[collection][dataName] = dataValue;
-      lastDocument[collection][dataName] = doc;
-  	}
+      lastDoc[collection][dataName] = doc;
+    }
   }
+
+  if (lastDBDoc[collection] === undefined ) lastDBDoc[collection] = {};
+  // Time in range. Wait next message...
+  if (obj !== undefined && obj.interval !== undefined && lastDBDoc[collection][dataName] !== undefined && ((doc['timestamp'] - lastDBDoc[collection][dataName]['timestamp'])/1000) < obj.interval ) return;
 
   // Inset the document
   insertDocument(doc, collection);
+  lastDBDoc[collection][dataName] = doc;
 
 });
 

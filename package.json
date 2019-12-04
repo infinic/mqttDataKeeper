@@ -1,11 +1,11 @@
 {
   "name": "mqttdatakeeper",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Small daemon, which save all data coming to MQTT broker in MongoDB.",
   "main": "app.js",
   "dependencies": {
     "async-mqtt": "^2.4.2",
-    "mongodb": "^3.3.2",
+    "mongodb": "^3.3.5",
     "nedb-async-await": "^0.1.2"
   },
   "devDependencies": {},
